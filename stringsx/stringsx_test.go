@@ -55,3 +55,31 @@ func TestSnipToEnd(t *testing.T) {
 		}
 	}
 }
+
+var aligntests = []struct {
+	in      string
+	padWith rune
+	length  int
+	left    string
+	right   string
+	center  string
+}{
+	{"abc", ' ', -1, "abc", "abc", "abc"},
+	{"abc", ' ', 0, "abc", "abc", "abc"},
+	{"abc", ' ', 5, "abc  ", "  abc", " abc "},
+	{"abc", '-', 6, "abc---", "---abc", "-abc--"},
+}
+
+func TestAlign(t *testing.T) {
+	for _, tt := range aligntests {
+		fn := func(name string, align func(in string, pad rune, l int) string, expected string) {
+			actual := align(tt.in, tt.padWith, tt.length)
+			if actual != expected {
+				t.Errorf(`%v("%v", '%v', %v) = "%v"; want "%v"`, name, tt.in, string(tt.padWith), tt.length, actual, expected)
+			}
+		}
+		fn("AlignLeft", stringsx.AlignLeft, tt.left)
+		fn("AlignRight", stringsx.AlignRight, tt.right)
+		fn("AlignCenter", stringsx.AlignCenter, tt.center)
+	}
+}
